@@ -89,10 +89,6 @@ def ai_move():
 
 
 def handle_click(i):
-    if winner == "X":
-    # Punish last AI move
-    update_q(prev_state=get_state(st.session_state.board), action=None, reward=-1, next_state="terminal")
-
     if st.session_state.game_over:
         return
 
@@ -103,18 +99,30 @@ def handle_click(i):
         if winner:
             st.session_state.game_over = True
             st.session_state.winner = winner
+
+            # Player wins → punish AI
+            update_q(
+                prev_state=get_state(st.session_state.board),
+                action=None,
+                reward=-1,
+                next_state="terminal"
+            )
+
             st.rerun()
 
+        # AI move
+        prev_state = get_state(st.session_state.board)
         ai_idx = ai_move()
-        if ai_idx is not None:
-            st.session_state.board[ai_idx] = "O"
 
         winner = check_winner(st.session_state.board)
         if winner:
             st.session_state.game_over = True
             st.session_state.winner = winner
 
+            st.rerun()
+
         st.rerun()
+
 
 st.title("🎮 Tic Tac Toe (Streamlit)")
 
